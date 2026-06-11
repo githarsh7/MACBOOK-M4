@@ -1,6 +1,6 @@
 # MacBook M4 Landing Page
 
-A modern and responsive MacBook M4-inspired landing page built with React, Vite, and Tailwind CSS. This project recreates Apple's premium design language with smooth layouts, clean typography, interactive sections, and a visually appealing user experience.
+A modern and responsive MacBook M4-inspired landing page built with React and Tailwind CSS. This project recreates Apple's premium design language with smooth layouts, clean typography, interactive sections, and a visually appealing user experience.
 
 ## Preview
 
