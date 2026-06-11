@@ -1,50 +1,57 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React, { useRef, useEffect } from "react";
-import { useMediaQuery } from "react-responsive";
+import React, { useRef, useEffect, useState } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Showcase = () => {
-  const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
+  const [isDesktop, setIsDesktop] = useState(false);
   const videoRef = useRef(null);
   const maskImgRef = useRef(null);
   const contentRef = useRef(null);
   const sectionRef = useRef(null);
 
+  // Detect screen size using window.innerWidth — works in DevTools AND real devices
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   // Safe autoplay
-  useGSAP(() => {
+  useEffect(() => {
     if (videoRef.current) {
       const p = videoRef.current.play();
       if (p !== undefined) p.catch(() => {});
     }
   }, []);
 
-  // DESKTOP: original GSAP scroll pin — untouched
+  // DESKTOP: original GSAP pin
   useGSAP(() => {
-    if (isDesktop) {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#showcase",
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-          pin: true,
-        },
-      });
-      tl.to(".mask img", { transform: "scale(1.1)" })
-        .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
-    }
+    if (!isDesktop) return;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#showcase",
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+        pin: true,
+      },
+    });
+    tl.to(".mask img", { transform: "scale(1.1)" })
+      .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
+
+    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
   }, [isDesktop]);
 
-  // MOBILE: Use IntersectionObserver to trigger a CSS keyframe zoom
-  // This bypasses all GSAP/Lenis/ScrollTrigger mobile issues entirely
+  // MOBILE: IntersectionObserver zoom — fires when section enters viewport
   useEffect(() => {
     if (isDesktop) return;
     if (!maskImgRef.current || !contentRef.current || !sectionRef.current) return;
 
-    // Inject a keyframe animation into the page
     const styleId = "m4-zoom-style";
     if (!document.getElementById(styleId)) {
       const style = document.createElement("style");
@@ -65,13 +72,9 @@ const Showcase = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Trigger zoom on the logo
             maskImgRef.current?.classList.add("m4-zooming");
-            // Fade in content after zoom starts
             setTimeout(() => {
-              if (contentRef.current) {
-                contentRef.current.classList.add("visible");
-              }
+              contentRef.current?.classList.add("visible");
             }, 1200);
             observer.disconnect();
           }
