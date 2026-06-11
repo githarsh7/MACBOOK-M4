@@ -19,7 +19,6 @@ const Showcase = () => {
     }
   }, []);
 
-  // Desktop-only GSAP pin (unchanged — already correct)
   useGSAP(() => {
     if (!isTablet) {
       const timeline = gsap.timeline({
@@ -40,7 +39,6 @@ const Showcase = () => {
   return (
     <section id="showcase">
       <div className="media">
-        {
         <video
           ref={videoRef}
           src="/Videos/game.mp4"
@@ -49,7 +47,7 @@ const Showcase = () => {
           playsInline
           autoPlay
           preload="none"
-          className="w-full h-[56vw] min-h-[260px] lg:h-auto object-cover object-center"
+          className="w-full object-cover object-center"
         />
         <div className="mask lg:-mt-[2vw]">
           <img src="/Images/mask-logo.svg" alt="" />
