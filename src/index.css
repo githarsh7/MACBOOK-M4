@@ -15,49 +15,34 @@ html, body {
 
     video {
       @apply w-full object-cover object-center;
-      height: 70vw;
-      min-height: 320px;
-    }
-
-    @media (min-width: 768px) {
-      video {
-        height: 56vw;
-      }
+      height: 100svh;
     }
 
     @media (min-width: 1024px) {
       video {
         height: auto;
-        min-height: unset;
       }
     }
 
     .mask {
       @apply absolute inset-0 flex items-center justify-center;
 
-      /* Mobile: SVG fills the full width of the video */
+      /* Mobile: start tiny so GSAP can zoom it in */
       img {
-        width: 90%;
+        width: 100%;
         height: auto;
-        transform: none;
+        transform: scale(0.08);
+        transform-origin: center center;
       }
 
-      /* Tablet */
-      @media (min-width: 768px) {
-        img {
-          width: 80%;
-          height: auto;
-          transform: none;
-        }
-      }
-
-      /* Desktop: original matrix transform for the pinned zoom effect */
+      /* Desktop: original matrix transform — GSAP takes over from here */
       @media (min-width: 1024px) {
-        @apply -top-20;
+        @apply h-full top-0 inset-auto;
         img {
           width: auto;
-          @apply h-full scale-100;
+          @apply h-full;
           transform: matrix(80, 0, 0, 80, 0, 0);
+          transform-origin: unset;
         }
       }
     }
@@ -65,8 +50,6 @@ html, body {
 
   .content {
     @apply relative z-10 my-5 bg-black font-semibold;
-
-    /* Mobile: visible by default, GSAP animates it in via fromTo */
     opacity: 0;
 
     @media (min-width: 1024px) {
