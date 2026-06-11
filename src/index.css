@@ -11,34 +11,52 @@ html, body {
   @apply relative;
 
   .media {
-    @apply relative overflow-hidden;
-
-    video {
-      @apply w-full object-cover object-center;
-      height: 100svh;
-    }
+    /* CRITICAL: position relative + explicit height so .mask can sit ON TOP of the video */
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100svh;        /* mobile: full screen height */
 
     @media (min-width: 1024px) {
-      video {
-        height: auto;
-      }
+      height: 100vh;       /* desktop: GSAP controls via pin */
+    }
+
+    video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     .mask {
-      @apply absolute inset-0 flex items-center justify-center;
+      /* Sits on top of the video, centered, fills the whole .media box */
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       img {
+        /* Mobile: start TINY so GSAP can zoom it in */
         width: 100%;
         height: auto;
-        transform: scale(0.08);
+        transform: scale(0.06);
         transform-origin: center center;
       }
 
       @media (min-width: 1024px) {
-        @apply h-full top-0 inset-auto;
+        /* Desktop: original — GSAP animates from matrix(80,80) to scale(1.1) */
+        align-items: unset;
+        justify-content: unset;
+        height: 100%;
+        top: -5rem;
+        inset: unset;
+
         img {
           width: auto;
-          @apply h-full;
+          height: 100%;
           transform: matrix(80, 0, 0, 80, 0, 0);
           transform-origin: unset;
         }
@@ -51,7 +69,8 @@ html, body {
     opacity: 0;
 
     @media (min-width: 1024px) {
-      @apply -mt-40 opacity-0;
+      @apply -mt-40;
+      opacity: 0;
     }
 
     .wrapper {
