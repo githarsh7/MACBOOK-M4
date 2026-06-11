@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -9,6 +9,9 @@ gsap.registerPlugin(ScrollTrigger);
 const Showcase = () => {
   const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
   const videoRef = useRef(null);
+  const maskImgRef = useRef(null);
+  const contentRef = useRef(null);
+  const sectionRef = useRef(null);
 
   // Safe autoplay
   useGSAP(() => {
@@ -18,7 +21,7 @@ const Showcase = () => {
     }
   }, []);
 
-  // DESKTOP: original pinned scroll — unchanged, already works
+  // DESKTOP: original GSAP scroll pin — untouched
   useGSAP(() => {
     if (isDesktop) {
       const tl = gsap.timeline({
@@ -35,39 +38,54 @@ const Showcase = () => {
     }
   }, [isDesktop]);
 
-  // MOBILE: same cinematic zoom — pin the section, zoom logo from scale(0.06) → 1
-  useGSAP(() => {
-    if (!isDesktop) {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#showcase",
-          start: "top top",
-          end: "+=200%",   // pin for 2x screen-height of scroll distance
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
+  // MOBILE: Use IntersectionObserver to trigger a CSS keyframe zoom
+  // This bypasses all GSAP/Lenis/ScrollTrigger mobile issues entirely
+  useEffect(() => {
+    if (isDesktop) return;
+    if (!maskImgRef.current || !contentRef.current || !sectionRef.current) return;
 
-      // Phase 1: M4 logo zooms from tiny dot → fills screen (game video visible behind it)
-      tl.to(".mask img", {
-        scale: 1.1,
-        ease: "none",
-        duration: 3,
-      });
-
-      // Phase 2: Rocket Chip content fades in
-      tl.to(".content", {
-        opacity: 1,
-        y: 0,
-        ease: "power1.in",
-        duration: 1,
-      });
+    // Inject a keyframe animation into the page
+    const styleId = "m4-zoom-style";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.textContent = `
+        @keyframes m4ZoomIn {
+          from { transform: scale(0.05); }
+          to   { transform: scale(1.1); }
+        }
+        .m4-zooming {
+          animation: m4ZoomIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+        }
+      `;
+      document.head.appendChild(style);
     }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Trigger zoom on the logo
+            maskImgRef.current?.classList.add("m4-zooming");
+            // Fade in content after zoom starts
+            setTimeout(() => {
+              if (contentRef.current) {
+                contentRef.current.classList.add("visible");
+              }
+            }, 1200);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
   }, [isDesktop]);
 
   return (
-    <section id="showcase">
+    <section id="showcase" ref={sectionRef}>
       <div className="media">
         <video
           ref={videoRef}
@@ -79,11 +97,11 @@ const Showcase = () => {
           preload="none"
         />
         <div className="mask">
-          <img src="/Images/mask-logo.svg" alt="" />
+          <img ref={maskImgRef} src="/Images/mask-logo.svg" alt="" />
         </div>
       </div>
 
-      <div className="content">
+      <div className="content" ref={contentRef}>
         <div className="wrapper">
           <div className="lg:max-w-md">
             <h2>Rocket Chip</h2>
