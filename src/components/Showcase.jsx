@@ -10,7 +10,7 @@ const Showcase = () => {
   const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
   const videoRef = useRef(null);
 
-  // Safe autoplay
+  // Safe autoplay on all devices
   useGSAP(() => {
     if (videoRef.current) {
       const p = videoRef.current.play();
@@ -18,10 +18,11 @@ const Showcase = () => {
     }
   }, []);
 
-  // Desktop: full pin + zoom + fade-in effect (unchanged)
+  // DESKTOP: original pinned scroll — logo zooms in via matrix scale,
+  // then Rocket Chip content fades in
   useGSAP(() => {
     if (isDesktop) {
-      const timeline = gsap.timeline({
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: "#showcase",
           start: "top top",
@@ -30,48 +31,40 @@ const Showcase = () => {
           pin: true,
         },
       });
-      timeline
-        .to(".mask img", { transform: "scale(1.1)" })
+      tl.to(".mask img", { transform: "scale(1.1)" })
         .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
     }
   }, [isDesktop]);
 
-  // Mobile/Tablet: scroll-triggered fade+scale on the mask logo
+  // MOBILE: replicate the same zoom-in effect
+  // The SVG starts at scale(0.08) via CSS, then zooms to scale(1)
+  // pinned while scrolling — same feel as desktop
   useGSAP(() => {
     if (!isDesktop) {
-      // Animate the mask logo: starts small, scales up as you scroll into it
-      gsap.fromTo(
-        ".mask img",
-        { scale: 0.7, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".media",
-            start: "top 80%",
-            end: "center center",
-            scrub: true,
-          },
-        }
-      );
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#showcase",
+          start: "top top",
+          end: "+=150%",       // pin for 1.5x screen height of scrolling
+          scrub: true,
+          pin: true,
+        },
+      });
 
-      // Content fades in from below
-      gsap.fromTo(
-        ".content",
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".content",
-            start: "top 85%",
-            end: "top 60%",
-            scrub: true,
-          },
-        }
-      );
+      // Phase 1: logo zooms from tiny to full screen (same as desktop)
+      tl.to(".mask img", {
+        scale: 1,
+        ease: "none",
+        duration: 2,
+      });
+
+      // Phase 2: Rocket Chip content fades in
+      tl.to(".content", {
+        opacity: 1,
+        y: 0,
+        ease: "power1.in",
+        duration: 1,
+      });
     }
   }, [isDesktop]);
 
@@ -88,7 +81,7 @@ const Showcase = () => {
           preload="none"
           className="w-full object-cover object-center"
         />
-        <div className="mask lg:-mt-[2vw]">
+        <div className="mask">
           <img src="/Images/mask-logo.svg" alt="" />
         </div>
       </div>
