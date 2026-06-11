@@ -11,14 +11,13 @@ html, body {
   @apply relative;
 
   .media {
-    /* CRITICAL: position relative + explicit height so .mask can sit ON TOP of the video */
     position: relative;
-    overflow: hidden;
     width: 100%;
-    height: 100svh;        /* mobile: full screen height */
+    height: 100svh;
+    overflow: hidden;
 
     @media (min-width: 1024px) {
-      height: 100vh;       /* desktop: GSAP controls via pin */
+      height: 100vh;
     }
 
     video {
@@ -27,29 +26,26 @@ html, body {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center;
     }
 
     .mask {
-      /* Sits on top of the video, centered, fills the whole .media box */
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 2;
 
       img {
-        /* Mobile: start TINY so GSAP can zoom it in */
         width: 100%;
         height: auto;
-        transform: scale(0.06);
+        transform: scale(0.05);
         transform-origin: center center;
+        transition: none;
       }
 
       @media (min-width: 1024px) {
-        /* Desktop: original — GSAP animates from matrix(80,80) to scale(1.1) */
-        align-items: unset;
-        justify-content: unset;
+        display: block;
         height: 100%;
         top: -5rem;
         inset: unset;
@@ -67,19 +63,21 @@ html, body {
   .content {
     @apply relative z-10 my-5 bg-black font-semibold;
     opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     @media (min-width: 1024px) {
       @apply -mt-40;
       opacity: 0;
+      transform: none;
+      transition: none;
     }
 
     .wrapper {
       @apply container mx-auto px-5 pb-16 lg:pb-20 2xl:px-0
-             flex flex-col lg:flex-row justify-center gap-10 lg:gap-20;
-    }
-
-    h2 { @apply font-semibold text-2xl sm:text-3xl lg:text-7xl text-white; }
-    h3 { @apply font-semibold text-xl sm:text-2xl lg:text-5xl text-white; }
-    p  { @apply text-base sm:text-lg lg:text-xl; }
-  }
-}
+             flex flex-col lg:flex-row
