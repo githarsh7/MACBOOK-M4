@@ -33,24 +33,29 @@ html, body {
     }
 
     .mask {
-      @apply absolute h-full top-0;
+      @apply absolute inset-0 flex items-center justify-center;
 
+      /* Mobile: SVG fills the full width of the video */
       img {
-        @apply h-full;
-        transform: matrix(1, 0, 0, 1, 0, 0);
+        width: 90%;
+        height: auto;
+        transform: none;
       }
 
+      /* Tablet */
       @media (min-width: 768px) {
-        @apply -top-10;
         img {
-          transform: matrix(1, 0, 0, 1, 0, 0);
-          @apply scale-110;
+          width: 80%;
+          height: auto;
+          transform: none;
         }
       }
 
+      /* Desktop: original matrix transform for the pinned zoom effect */
       @media (min-width: 1024px) {
         @apply -top-20;
         img {
+          width: auto;
           @apply h-full scale-100;
           transform: matrix(80, 0, 0, 80, 0, 0);
         }
@@ -60,6 +65,9 @@ html, body {
 
   .content {
     @apply relative z-10 my-5 bg-black font-semibold;
+
+    /* Mobile: visible by default, GSAP animates it in via fromTo */
+    opacity: 0;
 
     @media (min-width: 1024px) {
       @apply -mt-40 opacity-0;
