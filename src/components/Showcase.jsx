@@ -7,20 +7,20 @@ import { useMediaQuery } from "react-responsive";
 gsap.registerPlugin(ScrollTrigger);
 
 const Showcase = () => {
-  const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
+  const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
   const videoRef = useRef(null);
 
+  // Safe autoplay
   useGSAP(() => {
     if (videoRef.current) {
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
+      const p = videoRef.current.play();
+      if (p !== undefined) p.catch(() => {});
     }
   }, []);
 
+  // Desktop: full pin + zoom + fade-in effect (unchanged)
   useGSAP(() => {
-    if (!isTablet) {
+    if (isDesktop) {
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: "#showcase",
@@ -34,7 +34,46 @@ const Showcase = () => {
         .to(".mask img", { transform: "scale(1.1)" })
         .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
     }
-  }, [isTablet]);
+  }, [isDesktop]);
+
+  // Mobile/Tablet: scroll-triggered fade+scale on the mask logo
+  useGSAP(() => {
+    if (!isDesktop) {
+      // Animate the mask logo: starts small, scales up as you scroll into it
+      gsap.fromTo(
+        ".mask img",
+        { scale: 0.7, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".media",
+            start: "top 80%",
+            end: "center center",
+            scrub: true,
+          },
+        }
+      );
+
+      // Content fades in from below
+      gsap.fromTo(
+        ".content",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".content",
+            start: "top 85%",
+            end: "top 60%",
+            scrub: true,
+          },
+        }
+      );
+    }
+  }, [isDesktop]);
 
   return (
     <section id="showcase">
