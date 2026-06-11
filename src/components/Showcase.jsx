@@ -10,7 +10,6 @@ const Showcase = () => {
   const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
   const videoRef = useRef(null);
 
-  // Safe autoplay on all devices
   useGSAP(() => {
     if (videoRef.current) {
       const p = videoRef.current.play();
@@ -18,8 +17,7 @@ const Showcase = () => {
     }
   }, []);
 
-  // DESKTOP: original pinned scroll — logo zooms in via matrix scale,
-  // then Rocket Chip content fades in
+  // Desktop: original effect unchanged
   useGSAP(() => {
     if (isDesktop) {
       const tl = gsap.timeline({
@@ -36,35 +34,20 @@ const Showcase = () => {
     }
   }, [isDesktop]);
 
-  // MOBILE: replicate the same zoom-in effect
-  // The SVG starts at scale(0.08) via CSS, then zooms to scale(1)
-  // pinned while scrolling — same feel as desktop
+  // Mobile: same zoom-in effect — starts at scale(0.08) from CSS, zooms to 1
   useGSAP(() => {
     if (!isDesktop) {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: "#showcase",
           start: "top top",
-          end: "+=150%",       // pin for 1.5x screen height of scrolling
+          end: "+=150%",
           scrub: true,
           pin: true,
         },
       });
-
-      // Phase 1: logo zooms from tiny to full screen (same as desktop)
-      tl.to(".mask img", {
-        scale: 1,
-        ease: "none",
-        duration: 2,
-      });
-
-      // Phase 2: Rocket Chip content fades in
-      tl.to(".content", {
-        opacity: 1,
-        y: 0,
-        ease: "power1.in",
-        duration: 1,
-      });
+      tl.to(".mask img", { scale: 1, ease: "none", duration: 2 });
+      tl.to(".content", { opacity: 1, y: 0, ease: "power1.in", duration: 1 });
     }
   }, [isDesktop]);
 
@@ -93,9 +76,7 @@ const Showcase = () => {
             <div className="space-y-5 mt-7 lg:pe-10">
               <p className="text-gray-400">
                 Introducing{" "}
-                <span className="text-white">
-                  M4, the next generation of Apple silicon
-                </span>
+                <span className="text-white">M4, the next generation of Apple silicon</span>
                 . M4 powers
               </p>
               <p className="text-gray-400">
@@ -120,7 +101,7 @@ const Showcase = () => {
             <div className="space-y-2 text-gray-400">
               <p>Up to</p>
               <h3>1.5x faster</h3>
-              <p>CPU performance than M2</p>
+              <p>pro rendering performance than M2</p>
             </div>
           </div>
         </div>
