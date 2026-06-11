@@ -27,7 +27,6 @@ html, body {
     .mask {
       @apply absolute inset-0 flex items-center justify-center;
 
-      /* Mobile: start tiny so GSAP can zoom it in */
       img {
         width: 100%;
         height: auto;
@@ -35,7 +34,6 @@ html, body {
         transform-origin: center center;
       }
 
-      /* Desktop: original matrix transform — GSAP takes over from here */
       @media (min-width: 1024px) {
         @apply h-full top-0 inset-auto;
         img {
@@ -61,16 +59,8 @@ html, body {
              flex flex-col lg:flex-row justify-center gap-10 lg:gap-20;
     }
 
-    h2 {
-      @apply font-semibold text-2xl sm:text-3xl lg:text-7xl text-white;
-    }
-
-    h3 {
-      @apply font-semibold text-xl sm:text-2xl lg:text-5xl text-white;
-    }
-
-    p {
-      @apply text-base sm:text-lg lg:text-xl;
-    }
+    h2 { @apply font-semibold text-2xl sm:text-3xl lg:text-7xl text-white; }
+    h3 { @apply font-semibold text-xl sm:text-2xl lg:text-5xl text-white; }
+    p  { @apply text-base sm:text-lg lg:text-xl; }
   }
 }
