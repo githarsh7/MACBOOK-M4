@@ -24,12 +24,11 @@ A modern and responsive MacBook M4-inspired landing page built with React, Vite,
 
 ## Tech Stack
 
-- React
-- Vite
-- Tailwind CSS
-- JavaScript
-- HTML5
-- CSS3
+- React,
+- Tailwind CSS,
+- JavaScript,
+- HTML5,
+- CSS3.
 
 ## Installation
 
