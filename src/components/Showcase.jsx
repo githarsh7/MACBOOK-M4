@@ -1,14 +1,25 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React from "react";
+import React, { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Showcase = () => {
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
+  const videoRef = useRef(null);
 
+  useGSAP(() => {
+    if (videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {});
+      }
+    }
+  }, []);
+
+  // Desktop-only GSAP pin (unchanged — already correct)
   useGSAP(() => {
     if (!isTablet) {
       const timeline = gsap.timeline({
@@ -21,9 +32,7 @@ const Showcase = () => {
         },
       });
       timeline
-        .to(".mask img", {
-          transform: "scale(1.1)",
-        })
+        .to(".mask img", { transform: "scale(1.1)" })
         .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
     }
   }, [isTablet]);
@@ -31,13 +40,22 @@ const Showcase = () => {
   return (
     <section id="showcase">
       <div className="media">
-        <video src="/Videos/game.mp4" loop muted playsInline autoPlay></video>
+        {
+        <video
+          ref={videoRef}
+          src="/Videos/game.mp4"
+          loop
+          muted
+          playsInline
+          autoPlay
+          preload="none"
+          className="w-full h-[56vw] min-h-[260px] lg:h-auto object-cover object-center"
+        />
         <div className="mask lg:-mt-[2vw]">
           <img src="/Images/mask-logo.svg" alt="" />
         </div>
       </div>
 
-      {/* Mobile: always visible. Desktop: animated via GSAP */}
       <div className="content">
         <div className="wrapper">
           <div className="lg:max-w-md">
