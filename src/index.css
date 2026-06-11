@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@import 'lenis/dist/lenis.css';
+
+html, body {
+  background: black;
+  height: 100%;
+  width: 100%;
+}
+
+#showcase {
+  @apply relative;
+
+  /* ── Media (video + mask) ── */
+  .media {
+    @apply relative overflow-hidden;
+
+    video {
+      @apply w-full object-cover object-center;
+    }
+
+    .mask {
+      @apply absolute h-full top-0;
+
+      /* Mobile: scale down the matrix-transformed SVG so it fits */
+      img {
+        @apply h-full;
+        transform: matrix(1, 0, 0, 1, 0, 0);
+      }
+
+      /* Tablet and above */
+      @media (min-width: 768px) {
+        @apply -top-10;
+        img {
+          transform: matrix(1, 0, 0, 1, 0, 0);
+          @apply scale-110;
+        }
+      }
+
+      /* Desktop */
+      @media (min-width: 1024px) {
+        @apply -top-20;
+        img {
+          @apply h-full scale-100;
+          transform: matrix(80, 0, 0, 80, 0, 0);
+        }
+      }
+    }
+  }
+
+  /* ── Content ── */
+  .content {
+    @apply relative z-10 my-5 bg-black font-semibold;
+
+    /* On desktop: pull up behind the video and start invisible for GSAP */
+    @media (min-width: 1024px) {
+      @apply -mt-40 opacity-0;
+    }
+
+    .wrapper {
+      @apply container mx-auto px-5 pb-16 lg:pb-20 2xl:px-0
+             flex flex-col lg:flex-row justify-center gap-10 lg:gap-20;
+    }
+
+    h2 {
+      @apply font-semibold text-2xl sm:text-3xl lg:text-7xl text-white;
+    }
+
+    h3 {
+      @apply font-semibold text-xl sm:text-2xl lg:text-5xl text-white;
+    }
+
+    p {
+      @apply text-base sm:text-lg lg:text-xl;
+    }
+  }
+}
