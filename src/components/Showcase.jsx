@@ -10,6 +10,7 @@ const Showcase = () => {
   const isDesktop = useMediaQuery({ query: "(min-width: 1024px)" });
   const videoRef = useRef(null);
 
+  // Safe autoplay
   useGSAP(() => {
     if (videoRef.current) {
       const p = videoRef.current.play();
@@ -17,7 +18,7 @@ const Showcase = () => {
     }
   }, []);
 
-  // Desktop: original effect unchanged
+  // DESKTOP: original pinned scroll — unchanged, already works
   useGSAP(() => {
     if (isDesktop) {
       const tl = gsap.timeline({
@@ -34,20 +35,34 @@ const Showcase = () => {
     }
   }, [isDesktop]);
 
-  // Mobile: same zoom-in effect — starts at scale(0.08) from CSS, zooms to 1
+  // MOBILE: same cinematic zoom — pin the section, zoom logo from scale(0.06) → 1
   useGSAP(() => {
     if (!isDesktop) {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: "#showcase",
           start: "top top",
-          end: "+=150%",
-          scrub: true,
+          end: "+=200%",   // pin for 2x screen-height of scroll distance
+          scrub: 1,
           pin: true,
+          anticipatePin: 1,
         },
       });
-      tl.to(".mask img", { scale: 1, ease: "none", duration: 2 });
-      tl.to(".content", { opacity: 1, y: 0, ease: "power1.in", duration: 1 });
+
+      // Phase 1: M4 logo zooms from tiny dot → fills screen (game video visible behind it)
+      tl.to(".mask img", {
+        scale: 1.1,
+        ease: "none",
+        duration: 3,
+      });
+
+      // Phase 2: Rocket Chip content fades in
+      tl.to(".content", {
+        opacity: 1,
+        y: 0,
+        ease: "power1.in",
+        duration: 1,
+      });
     }
   }, [isDesktop]);
 
@@ -62,7 +77,6 @@ const Showcase = () => {
           playsInline
           autoPlay
           preload="none"
-          className="w-full object-cover object-center"
         />
         <div className="mask">
           <img src="/Images/mask-logo.svg" alt="" />
